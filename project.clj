@@ -1,4 +1,4 @@
-(defproject clojure-repl-uberjar "0.1.0-SNAPSHOT"
+(defproject clojure-repl-uberjar "0.1.1-SNAPSHOT"
   :description "A uberjar that provides Clojure REPL and some conveniences."
   :url "http://github.com/pw4ever/clojure-repl-uberjar"
   :license {:name "MIT License"

@@ -1,9 +1,11 @@
 (ns clojure-repl-uberjar.core
   (:require [clojure.string :as str]
-            [clojure.set :as set])
+            [clojure.set :as set]
+            [clojure.pprint :refer [pprint]])
   (:require [clojure.tools.cli :refer [parse-opts]]
             [clojure.tools.nrepl.server :refer [start-server stop-server
                                                 default-handler]]
+            [clojure.tools.nrepl :as repl]
             [cider.nrepl :refer [cider-middleware cider-nrepl-handler]]
             [refactor-nrepl.middleware :refer [wrap-refactor]])
   (:gen-class))
@@ -66,6 +68,39 @@
                 (when (> verbosity 0)
                   (println (format "(System/setProperty \"clojure.nrepl.port\" \"%s\")"
                                    (str nrepl-port))))
+                (let [init-code '[(do
+                                    (use 'clojure.pprint ; pprint print-table
+                                         'clojure.repl ; source doc apropos root-cause pst
+                                         'hara.reflect ; query-class query-instance
+                                         )
+                                    (require '[alembic.still
+                                               :refer [distill load-project]]
+                                             '[hiccup.core :refer [html]]
+                                             '[garden.core :refer [css]]
+                                             ;; piggieback/cljs-repl
+                                             '[cemerick.piggieback
+                                               :as piggieback]
+                                             ;; weasel.repl-env
+                                             '[weasel.repl.websocket
+                                               :as weasel]
+                                             ;; https://github.com/bhauman/lein-figwheel/wiki/Using-the-Figwheel-REPL-within-NRepl
+                                             ;;(use 'figwheel-sidecar.repl-api)
+                                             ;;(start-figwheel!)
+                                             '[figwheel-sidecar.repl-api
+                                               :as figwheel]
+                                             ;; https://github.com/stuartsierra/component
+                                             '[com.stuartsierra.component
+                                               :as component]))]]
+                  (doseq [c init-code]
+                    (try
+                      (with-open [conn (repl/connect :host nrepl-address
+                                                     :port nrepl-port)]
+                        (-> (repl/client conn 1000)
+                            (repl/message {:op :eval :code (str c)})
+                            dorun))
+                      (when (> verbosity 0)
+                        (pprint c))
+                      (catch Exception e))))
                 (when @nrepl-server-finished
                   (when (> verbosity 0)
                     (println (format "nREPL shutting down.")))
