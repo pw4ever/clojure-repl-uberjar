@@ -1,9 +1,9 @@
-(defproject clojure-repl-uberjar "0.1.1-SNAPSHOT"
+(defproject clojure-repl-uberjar "0.1.2-SNAPSHOT"
   :description "A uberjar that provides Clojure REPL and some conveniences."
   :url "http://github.com/pw4ever/clojure-repl-uberjar"
   :license {:name "MIT License"
             :url "https://opensource.org/licenses/MIT"}
-  :dependencies [[org.clojure/clojure "1.7.0"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.7.228"]
                  [org.clojure/tools.nrepl "0.2.12"]
                  [org.clojure/tools.cli "0.3.3"]
